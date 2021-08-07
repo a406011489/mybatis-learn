@@ -44,6 +44,7 @@ public class PropertyParser {
   public static final String KEY_DEFAULT_VALUE_SEPARATOR = KEY_PREFIX + "default-value-separator";
 
   private static final String ENABLE_DEFAULT_VALUE = "false";
+  // 默认值的分隔符。
   private static final String DEFAULT_VALUE_SEPARATOR = ":";
 
   private PropertyParser() {
@@ -58,6 +59,7 @@ public class PropertyParser {
 
   private static class VariableTokenHandler implements TokenHandler {
     private final Properties variables;
+    // 是否开启默认值功能。默认为 ENABLE_DEFAULT_VALUE ，即不开启。想要开启，可以配置如下：
     private final boolean enableDefaultValue;
     private final String defaultValueSeparator;
 

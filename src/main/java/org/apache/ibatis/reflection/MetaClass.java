@@ -27,7 +27,8 @@ import org.apache.ibatis.reflection.invoker.MethodInvoker;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
- * @author Clinton Begin
+ * 类的元数据，基于 Reflector 和 PropertyTokenizer ，提供对指定类的各种骚操作。
+ * 总之，该类是一个工具类
  */
 public class MetaClass {
 
@@ -54,9 +55,11 @@ public class MetaClass {
   }
 
   public String findProperty(String name, boolean useCamelCaseMapping) {
+    // <1> 下划线转驼峰
     if (useCamelCaseMapping) {
       name = name.replace("_", "");
     }
+    // <2> 获得属性
     return findProperty(name);
   }
 
@@ -145,6 +148,7 @@ public class MetaClass {
     }
   }
 
+  // 判断指定属性是否有 getting 方法。
   public boolean hasGetter(String name) {
     PropertyTokenizer prop = new PropertyTokenizer(name);
     if (prop.hasNext()) {
@@ -168,13 +172,20 @@ public class MetaClass {
   }
 
   private StringBuilder buildProperty(String name, StringBuilder builder) {
+    // 创建 PropertyTokenizer 对象，对 name 进行分词
     PropertyTokenizer prop = new PropertyTokenizer(name);
+
+    // 有子表达式
     if (prop.hasNext()) {
+      // <4> 获得属性名，并添加到 builder 中
       String propertyName = reflector.findPropertyName(prop.getName());
       if (propertyName != null) {
+        // 拼接属性到 builder 中
         builder.append(propertyName);
         builder.append(".");
+        // 创建 MetaClass 对象
         MetaClass metaProp = metaClassForProperty(propertyName);
+        // 递归解析子表达式 children ，并将结果添加到 builder 中
         metaProp.buildProperty(prop.getChildren(), builder);
       }
     } else {

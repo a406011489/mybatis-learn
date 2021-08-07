@@ -28,6 +28,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
+// 参数名解析器
 public class ParamNameResolver {
 
   private static final String GENERIC_NAME_PREFIX = "param";
@@ -100,12 +101,7 @@ public class ParamNameResolver {
   }
 
   /**
-   * <p>
-   * A single non-special parameter is returned without a name.
-   * Multiple parameters are named using the naming rule.
-   * In addition to the default names, this method also adds the generic names (param1, param2,
-   * ...).
-   * </p>
+   * 获得参数名与值的映射
    */
   public Object getNamedParams(Object[] args) {
     final int paramCount = names.size();

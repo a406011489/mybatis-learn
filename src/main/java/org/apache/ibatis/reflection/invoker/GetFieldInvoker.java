@@ -19,10 +19,12 @@ import java.lang.reflect.Field;
 
 import org.apache.ibatis.reflection.Reflector;
 
-/**
- * @author Clinton Begin
- */
+// 获得 Field 调用者
 public class GetFieldInvoker implements Invoker {
+
+  /**
+   * Field 对象
+   */
   private final Field field;
 
   public GetFieldInvoker(Field field) {
@@ -32,10 +34,15 @@ public class GetFieldInvoker implements Invoker {
   @Override
   public Object invoke(Object target, Object[] args) throws IllegalAccessException {
     try {
+      // 获得属性
       return field.get(target);
     } catch (IllegalAccessException e) {
       if (Reflector.canControlMemberAccessible()) {
+
+        // 设置构造方法可以访问，避免是 private 等修饰符
         field.setAccessible(true);
+
+        // 获得属性
         return field.get(target);
       } else {
         throw e;

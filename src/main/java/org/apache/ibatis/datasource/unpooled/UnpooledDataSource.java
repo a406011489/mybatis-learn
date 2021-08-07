@@ -32,21 +32,41 @@ import javax.sql.DataSource;
 import org.apache.ibatis.io.Resources;
 
 /**
- * @author Clinton Begin
- * @author Eduardo Macarron
+ * 实现 DataSource 接口，非池化的 DataSource 对象。
  */
 public class UnpooledDataSource implements DataSource {
 
+  /**
+   * Driver 类加载器
+   */
   private ClassLoader driverClassLoader;
+
+  /**
+   * Driver 属性
+   */
   private Properties driverProperties;
+
+  /**
+   * 已注册的 Driver 映射
+   */
   private static Map<String, Driver> registeredDrivers = new ConcurrentHashMap<>();
 
+  /**
+   * Driver 类名
+   */
   private String driver;
   private String url;
   private String username;
   private String password;
 
+  /**
+   * 是否自动提交事务
+   */
   private Boolean autoCommit;
+
+  /**
+   * 默认事务隔离级别
+   */
   private Integer defaultTransactionIsolationLevel;
 
   static {
@@ -197,25 +217,38 @@ public class UnpooledDataSource implements DataSource {
   }
 
   private Connection doGetConnection(Properties properties) throws SQLException {
+
+    // <1> 初始化 Driver
     initializeDriver();
+
+    // <2> 获得 Connection 对象
     Connection connection = DriverManager.getConnection(url, properties);
+
+    // <3> 配置 Connection 对象，主要是设置自动提交和事务级别
     configureConnection(connection);
+
     return connection;
   }
 
   private synchronized void initializeDriver() throws SQLException {
+    // 判断 registeredDrivers 是否已经存在该 driver ，若不存在，进行初始化
     if (!registeredDrivers.containsKey(driver)) {
       Class<?> driverType;
       try {
+        // <2> 获得 driver 类 就是我们常见的 "Class.forName("com.mysql.jdbc.Driver")"，
+        // 相当于去加载数据库的驱动类
         if (driverClassLoader != null) {
           driverType = Class.forName(driver, true, driverClassLoader);
         } else {
           driverType = Resources.classForName(driver);
         }
-        // DriverManager requires the driver to be loaded via the system ClassLoader.
-        // http://www.kfu.com/~nsayer/Java/dyn-jdbc.html
+        // <3> 创建 Driver 对象
         Driver driverInstance = (Driver)driverType.newInstance();
+
+        // 创建 DriverProxy 对象，并注册到 DriverManager 中
         DriverManager.registerDriver(new DriverProxy(driverInstance));
+
+        // 添加到 registeredDrivers 中
         registeredDrivers.put(driver, driverInstance);
       } catch (Exception e) {
         throw new SQLException("Error setting driver on UnpooledDataSource. Cause: " + e);
@@ -223,10 +256,13 @@ public class UnpooledDataSource implements DataSource {
     }
   }
 
+  // 配置 Connection 对象。
   private void configureConnection(Connection conn) throws SQLException {
+    // 设置自动提交
     if (autoCommit != null && autoCommit != conn.getAutoCommit()) {
       conn.setAutoCommit(autoCommit);
     }
+    // 设置隔离级别
     if (defaultTransactionIsolationLevel != null) {
       conn.setTransactionIsolation(defaultTransactionIsolationLevel);
     }

@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.util.Enumeration;
@@ -30,9 +31,12 @@ public class UnpooledDataSourceTest {
 
   @Test
   public void shouldNotRegisterTheSameDriverMultipleTimes() throws Exception {
-    // https://code.google.com/p/mybatis/issues/detail?id=430
     UnpooledDataSource dataSource = null;
     dataSource = new UnpooledDataSource("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:multipledrivers", "sa", "");
+    System.out.println(dataSource);
+    Connection connection = dataSource.getConnection();
+    System.out.println(connection);
+
     dataSource.getConnection().close();
     int before = countRegisteredDrivers();
     dataSource = new UnpooledDataSource("org.hsqldb.jdbcDriver", "jdbc:hsqldb:mem:multipledrivers", "sa", "");

@@ -19,9 +19,7 @@ import java.lang.reflect.Field;
 
 import org.apache.ibatis.reflection.Reflector;
 
-/**
- * @author Clinton Begin
- */
+// 设置 Field 调用者
 public class SetFieldInvoker implements Invoker {
   private final Field field;
 

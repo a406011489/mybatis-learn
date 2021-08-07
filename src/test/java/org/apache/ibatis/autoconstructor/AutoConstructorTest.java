@@ -77,9 +77,7 @@ public class AutoConstructorTest {
   public void badSubject() {
     try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
       final AutoConstructorMapper mapper = sqlSession.getMapper(AutoConstructorMapper.class);
-      assertThrows(PersistenceException.class, () -> {
-        mapper.getBadSubjects();
-      });
+      assertThrows(PersistenceException.class, mapper::getBadSubjects);
     }
   }
 

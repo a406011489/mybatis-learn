@@ -39,16 +39,30 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-/**
- * @author Clinton Begin
- * @author Kazuki Shimizu
- */
 public class XPathParser {
 
+  // XML被解析后生成该对象
   private final Document document;
+
+  // 是否校验XML，一般为true
   private boolean validation;
+
+  /**
+   * XML实体解析器。默认情况下，对XML进行校验时，会基于XML文档开始位置指定的DTD文件或XSD文件。
+   * 例如说，解析mybatis-config.xml配置文件时，
+   * 会加载 http://mybatis.org/dtd/mybatis-3-config.dtd这个文件。
+   * 但是，如果每个应用启动都从网络加载该DTD文件，势必在弱网络下体验非常下，
+   * 甚至说应用部署在无网络的环境下，还会导致下载不下来，那么就会出现XML校验失败的情况。
+   * 所以，在实际场景下，MyBatis自定义了EntityResolver的实现，达到使用本地DTD文件，
+   * 从而避免下载网络DTD文件的效果。
+   * 另外，Spring 也自定义了 EntityResolver 的实现
+   */
   private EntityResolver entityResolver;
+
+  // 用来替换需要动态配置的属性值
   private Properties variables;
+
+  // 用于查询XML中的节点和元素。
   private XPath xpath;
 
   public XPathParser(String xml) {
@@ -218,6 +232,14 @@ public class XPathParser {
     return new XNode(this, node, variables);
   }
 
+  /**
+   * 获得指定元素或节点的值
+   *
+   * @param expression 表达式
+   * @param root 指定节点
+   * @param returnType 返回类型
+   * @return 值
+   */
   private Object evaluate(String expression, Object root, QName returnType) {
     try {
       return xpath.evaluate(expression, root, returnType);
@@ -229,6 +251,7 @@ public class XPathParser {
   private Document createDocument(InputSource inputSource) {
     // important: this must only be called AFTER common constructor
     try {
+      // 1> 创建 DocumentBuilderFactory 对象
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setValidating(validation);
 
@@ -238,9 +261,12 @@ public class XPathParser {
       factory.setCoalescing(false);
       factory.setExpandEntityReferences(true);
 
+      // 2> 创建 DocumentBuilder 对象
       DocumentBuilder builder = factory.newDocumentBuilder();
+      // 设置实体解析器
       builder.setEntityResolver(entityResolver);
-      builder.setErrorHandler(new ErrorHandler() {
+
+      builder.setErrorHandler(new ErrorHandler() {// 实现都空的
         @Override
         public void error(SAXParseException exception) throws SAXException {
           throw exception;
@@ -255,6 +281,7 @@ public class XPathParser {
         public void warning(SAXParseException exception) throws SAXException {
         }
       });
+      // 3> 解析 XML 文件
       return builder.parse(inputSource);
     } catch (Exception e) {
       throw new BuilderException("Error creating document instance.  Cause: " + e, e);

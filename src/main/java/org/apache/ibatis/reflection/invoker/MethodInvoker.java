@@ -20,9 +20,7 @@ import java.lang.reflect.Method;
 
 import org.apache.ibatis.reflection.Reflector;
 
-/**
- * @author Clinton Begin
- */
+// 指定方法的调用器
 public class MethodInvoker implements Invoker {
 
   private final Class<?> type;

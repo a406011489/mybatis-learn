@@ -26,7 +26,7 @@ import java.lang.reflect.WildcardType;
 import java.util.Arrays;
 
 /**
- * @author Iwao AVE!
+ * Type 是相对冷门的知识
  */
 public class TypeParameterResolver {
 

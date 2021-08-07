@@ -16,11 +16,14 @@
 package org.apache.ibatis.parsing;
 
 /**
- * @author Clinton Begin
+ * 通用的 Token 解析器
  */
 public class GenericTokenParser {
 
+  // 开始的 Token 字符串
   private final String openToken;
+
+  // 结束的 Token 字符串
   private final String closeToken;
   private final TokenHandler handler;
 
@@ -34,7 +37,7 @@ public class GenericTokenParser {
     if (text == null || text.isEmpty()) {
       return "";
     }
-    // search open token
+    // 寻找开始的 openToken 的位置
     int start = text.indexOf(openToken);
     if (start == -1) {
       return text;

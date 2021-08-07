@@ -37,18 +37,15 @@ public class XMLMapperEntityResolver implements EntityResolver {
   private static final String MYBATIS_CONFIG_SYSTEM = "mybatis-3-config.dtd";
   private static final String MYBATIS_MAPPER_SYSTEM = "mybatis-3-mapper.dtd";
 
+  /**
+   * 本地 mybatis-config.dtd 文件
+   */
   private static final String MYBATIS_CONFIG_DTD = "org/apache/ibatis/builder/xml/mybatis-3-config.dtd";
+  /**
+   * 本地 mybatis-mapper.dtd 文件
+   */
   private static final String MYBATIS_MAPPER_DTD = "org/apache/ibatis/builder/xml/mybatis-3-mapper.dtd";
 
-  /**
-   * Converts a public DTD into a local one
-   *
-   * @param publicId The public id that is what comes after "PUBLIC"
-   * @param systemId The system id that is what comes after the public id.
-   * @return The InputSource for the DTD
-   *
-   * @throws org.xml.sax.SAXException If anything goes wrong
-   */
   @Override
   public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
     try {
