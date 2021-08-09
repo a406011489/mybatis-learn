@@ -235,7 +235,9 @@ public class Configuration {
 
   public void setVfsImpl(Class<? extends VFS> vfsImpl) {
     if (vfsImpl != null) {
+      // 设置 vfsImpl 属性
       this.vfsImpl = vfsImpl;
+      // 添加到 VFS 中的自定义 VFS 类的集合
       VFS.addImplClass(this.vfsImpl);
     }
   }
@@ -309,6 +311,7 @@ public class Configuration {
   }
 
   public boolean isResourceLoaded(String resource) {
+    // 判断当前 Mapper 是否已经加载过。
     return loadedResources.contains(resource);
   }
 
@@ -738,6 +741,7 @@ public class Configuration {
     mapperRegistry.addMappers(packageName, superType);
   }
 
+  // 扫描该包下所有的 Mapper 接口，并添加到 mapperRegistry 中
   public void addMappers(String packageName) {
     mapperRegistry.addMappers(packageName);
   }

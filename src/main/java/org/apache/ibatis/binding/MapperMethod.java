@@ -36,14 +36,18 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
- * @author Clinton Begin
- * @author Eduardo Macarron
- * @author Lasse Voss
- * @author Kazuki Shimizu
+ * Mapper方法。在Mapper接口中，每个定义的方法，对应一个MapperMethod对象。
  */
 public class MapperMethod {
 
+  /**
+   * SqlCommand 对象
+   */
   private final SqlCommand command;
+
+  /**
+   * MethodSignature 对象
+   */
   private final MethodSignature method;
 
   public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
@@ -213,17 +217,27 @@ public class MapperMethod {
 
   }
 
+  // 是MapperMethod的内部静态类，SQL命令。
   public static class SqlCommand {
 
     private final String name;
+
+    /**
+     * SQL命令类型
+     */
     private final SqlCommandType type;
 
     public SqlCommand(Configuration configuration, Class<?> mapperInterface, Method method) {
       final String methodName = method.getName();
       final Class<?> declaringClass = method.getDeclaringClass();
+
+      // <1> 获得MappedStatement对象
       MappedStatement ms = resolveMappedStatement(mapperInterface, methodName, declaringClass,
           configuration);
+
+      // <2> 找不到 MappedStatement
       if (ms == null) {
+        // 如果有@Flush注解，则标记为FLUSH类型
         if(method.getAnnotation(Flush.class) != null){
           name = null;
           type = SqlCommandType.FLUSH;
@@ -231,7 +245,11 @@ public class MapperMethod {
           throw new BindingException("Invalid bound statement (not found): "
               + mapperInterface.getName() + "." + methodName);
         }
-      } else {
+      } else {  // <3> 找到 MappedStatement
+
+        // 这里的name属性对应 MappedStatement#getId() 方法获得的标识。
+        // 实际上，就是 ${NAMESPACE_NAME}.${语句_ID}
+        // 例如："org.apache.ibatis.autoconstructor.AutoConstructorMapper.getSubject2"
         name = ms.getId();
         type = ms.getSqlCommandType();
         if (type == SqlCommandType.UNKNOWN) {
@@ -248,14 +266,23 @@ public class MapperMethod {
       return type;
     }
 
+    // 获得 MappedStatement 对象。
     private MappedStatement resolveMappedStatement(Class<?> mapperInterface, String methodName,
         Class<?> declaringClass, Configuration configuration) {
+
+      // <1> 获得编号
       String statementId = mapperInterface.getName() + "." + methodName;
+
+      // <2> 如果有，获得 MappedStatement 对象，并返回
       if (configuration.hasStatement(statementId)) {
         return configuration.getMappedStatement(statementId);
+
+        // 如果没有，并且当前方法就是 declaringClass 声明的，则说明真的找不到
       } else if (mapperInterface.equals(declaringClass)) {
         return null;
       }
+
+      // 遍历父接口，继续获得 MappedStatement 对象
       for (Class<?> superInterface : mapperInterface.getInterfaces()) {
         if (declaringClass.isAssignableFrom(superInterface)) {
           MappedStatement ms = resolveMappedStatement(superInterface, methodName,

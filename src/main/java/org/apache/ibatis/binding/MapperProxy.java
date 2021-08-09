@@ -27,14 +27,27 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 import org.apache.ibatis.session.SqlSession;
 
 /**
- * @author Clinton Begin
- * @author Eduardo Macarron
+ * 关键是实现了 java.lang.reflect.InvocationHandler 接口，你懂的。
  */
 public class MapperProxy<T> implements InvocationHandler, Serializable {
 
   private static final long serialVersionUID = -6424540398559729838L;
+
+  /**
+   * SqlSession 对象
+   */
   private final SqlSession sqlSession;
+
+  /**
+   * Mapper 接口
+   */
   private final Class<T> mapperInterface;
+
+  /**
+   * 方法与 MapperMethod 的映射
+   *
+   * 从 {@link MapperProxyFactory#methodCache} 传递过来
+   */
   private final Map<Method, MapperMethod> methodCache;
 
   public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethod> methodCache) {
@@ -46,6 +59,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
+      // <1> 如果是Object定义的方法，直接调用
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       } else if (isDefaultMethod(method)) {

@@ -18,7 +18,7 @@ package org.apache.ibatis.logging.stdout;
 import org.apache.ibatis.logging.Log;
 
 /**
- * @author Clinton Begin
+ * 基于 System.out 和 System.err来实现。
  */
 public class StdOutImpl implements Log {
 

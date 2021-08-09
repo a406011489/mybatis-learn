@@ -24,10 +24,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import org.apache.ibatis.cache.Cache;
 
 /**
- * Weak Reference cache decorator.
- * Thanks to Dr. Heinz Kabutz for his guidance here.
- *
- * @author Clinton Begin
+ * 基于 java.lang.ref.WeakReference 的 Cache 实现类。
  */
 public class WeakCache implements Cache {
   private final Deque<Object> hardLinksToAvoidGarbageCollection;

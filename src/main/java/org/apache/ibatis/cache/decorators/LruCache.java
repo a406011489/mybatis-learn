@@ -22,14 +22,16 @@ import java.util.concurrent.locks.ReadWriteLock;
 import org.apache.ibatis.cache.Cache;
 
 /**
- * Lru (least recently used) cache decorator
- *
- * @author Clinton Begin
+ * 基于最少使用的淘汰机制的 Cache 实现类。
  */
 public class LruCache implements Cache {
 
   private final Cache delegate;
   private Map<Object, Object> keyMap;
+
+  /**
+   * 最老的键，即要被淘汰的
+   */
   private Object eldestKey;
 
   public LruCache(Cache delegate) {

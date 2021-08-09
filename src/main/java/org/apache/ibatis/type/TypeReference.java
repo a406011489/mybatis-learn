@@ -19,14 +19,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * References a generic type.
- *
- * @param <T> the referenced type
- * @since 3.1.0
- * @author Simone Tripodi
+ * 引用泛型抽象类。目的很简单，就是解析类上定义的泛型。
  */
 public abstract class TypeReference<T> {
 
+  /**
+   * 泛型
+   */
   private final Type rawType;
 
   protected TypeReference() {

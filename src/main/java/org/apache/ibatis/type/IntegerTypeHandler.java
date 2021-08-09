@@ -21,7 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author Clinton Begin
+ * Integer 类型的 TypeHandler 实现类。
  */
 public class IntegerTypeHandler extends BaseTypeHandler<Integer> {
 
