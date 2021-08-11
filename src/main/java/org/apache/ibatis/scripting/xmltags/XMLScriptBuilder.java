@@ -30,13 +30,28 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * @author Clinton Begin
+ * XML 动态语句( SQL )构建器，负责将 SQL 解析成 SqlSource 对象。
  */
 public class XMLScriptBuilder extends BaseBuilder {
 
+  /**
+   * 当前 SQL 的 XNode 对象
+   */
   private final XNode context;
+
+  /**
+   * 是否为动态 SQL
+   */
   private boolean isDynamic;
+
+  /**
+   * SQL 方法类型
+   */
   private final Class<?> parameterType;
+
+  /**
+   * NodeNodeHandler 的映射
+   */
   private final Map<String, NodeHandler> nodeHandlerMap = new HashMap<>();
 
   public XMLScriptBuilder(Configuration configuration, XNode context) {
@@ -64,7 +79,11 @@ public class XMLScriptBuilder extends BaseBuilder {
   }
 
   public SqlSource parseScriptNode() {
+
+    // <1> 解析 SQL
     MixedSqlNode rootSqlNode = parseDynamicTags(context);
+
+    // <2> 根据是否是动态 SQL ，创建对应的 DynamicSqlSource 或 RawSqlSource 对象。
     SqlSource sqlSource = null;
     if (isDynamic) {
       sqlSource = new DynamicSqlSource(configuration, rootSqlNode);
@@ -75,7 +94,11 @@ public class XMLScriptBuilder extends BaseBuilder {
   }
 
   protected MixedSqlNode parseDynamicTags(XNode node) {
+
+    // <1> 创建 SqlNode 数组
     List<SqlNode> contents = new ArrayList<>();
+
+    // <2> 遍历 SQL 节点的所有子节点
     NodeList children = node.getNode().getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       XNode child = node.newXNode(children.item(i));

@@ -26,11 +26,7 @@ import org.apache.ibatis.scripting.xmltags.SqlNode;
 import org.apache.ibatis.session.Configuration;
 
 /**
- * Static SqlSource. It is faster than {@link DynamicSqlSource} because mappings are
- * calculated during startup.
- *
- * @since 3.2.0
- * @author Eduardo Macarron
+ * 原始的 SqlSource 实现类。 适用于仅使用 #{} 表达式，或者不使用任何表达式的情况
  */
 public class RawSqlSource implements SqlSource {
 

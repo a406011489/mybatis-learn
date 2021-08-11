@@ -40,8 +40,19 @@ public class DefaultParameterHandler implements ParameterHandler {
 
   private final TypeHandlerRegistry typeHandlerRegistry;
 
+  /**
+   * MappedStatement 对象
+   */
   private final MappedStatement mappedStatement;
+
+  /**
+   * 参数对象
+   */
   private final Object parameterObject;
+
+  /**
+   * BoundSql 对象
+   */
   private final BoundSql boundSql;
   private final Configuration configuration;
 

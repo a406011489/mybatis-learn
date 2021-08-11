@@ -23,8 +23,14 @@ import java.util.Map;
  */
 public class LanguageDriverRegistry {
 
+  /**
+   * LanguageDriver 映射
+   */
   private final Map<Class<? extends LanguageDriver>, LanguageDriver> LANGUAGE_DRIVER_MAP = new HashMap<>();
 
+  /**
+   * 默认的 LanguageDriver 类
+   */
   private Class<? extends LanguageDriver> defaultDriverClass;
 
   public void register(Class<? extends LanguageDriver> cls) {

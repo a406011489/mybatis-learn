@@ -21,8 +21,7 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 
 /**
- * @author Clinton Begin
- * @author Kazuki Shimizu
+ * 空的 KeyGenerator 实现类，即无需主键生成。
  */
 public class NoKeyGenerator implements KeyGenerator {
 

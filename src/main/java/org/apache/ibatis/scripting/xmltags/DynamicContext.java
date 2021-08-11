@@ -26,7 +26,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
 /**
- * @author Clinton Begin
+ * 用于每次执行 SQL 操作时，记录动态 SQL 处理后的最终 SQL 字符串。
  */
 public class DynamicContext {
 

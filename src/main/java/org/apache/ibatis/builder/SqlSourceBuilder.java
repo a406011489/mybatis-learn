@@ -29,7 +29,7 @@ import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 
 /**
- * @author Clinton Begin
+ * SqlSource 构建器，负责将 SQL 语句中的 #{} 替换成相应的 ? 占位符，并获取该 ? 占位符对应的ParameterMapping 对象
  */
 public class SqlSourceBuilder extends BaseBuilder {
 
@@ -39,13 +39,30 @@ public class SqlSourceBuilder extends BaseBuilder {
     super(configuration);
   }
 
+  /**
+   * 执行解析原始 SQL ，成为 SqlSource 对象
+   *
+   * @param originalSql 原始 SQL
+   * @param parameterType 参数类型
+   * @param additionalParameters 附加参数集合。可能是空集合，也可能是 {@link org.apache.ibatis.scripting.xmltags.DynamicContext#bindings} 集合
+   * @return SqlSource 对象
+   */
   public SqlSource parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) {
+
+    // 创建 ParameterMappingTokenHandler 对象。
     ParameterMappingTokenHandler handler = new ParameterMappingTokenHandler(configuration, parameterType, additionalParameters);
+
+    // 创建 GenericTokenParser 对象。注意，传入的参数是 #{ 和 } 对。
     GenericTokenParser parser = new GenericTokenParser("#{", "}", handler);
+
+    // 调用 GenericTokenParser#parse(String originalSql) 方法，执行解析。如果匹配到 #{ + } 对后，会调用 ParameterMappingTokenHandler 对应的 #handleToken(String content) 方法。
     String sql = parser.parse(originalSql);
+
+    // 创建 StaticSqlSource 对象。
     return new StaticSqlSource(configuration, sql, handler.getParameterMappings());
   }
 
+  // 负责将匹配到的 #{ 和 } 对，替换成相应的 ? 占位符，并获取该 ? 占位符对应的 org.apache.ibatis.mapping.ParameterMapping 对象。
   private static class ParameterMappingTokenHandler extends BaseBuilder implements TokenHandler {
 
     private List<ParameterMapping> parameterMappings = new ArrayList<>();
