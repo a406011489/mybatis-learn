@@ -59,7 +59,10 @@ public class MapperMethod {
     Object result;
     switch (command.getType()) {
       case INSERT: {
-    	Object param = method.convertArgsToSqlCommandParam(args);
+        // 转换参数
+        Object param = method.convertArgsToSqlCommandParam(args);
+        // 执行 INSERT 操作
+        // 转换 rowCount
         result = rowCountResult(sqlSession.insert(command.getName(), param));
         break;
       }
@@ -74,16 +77,17 @@ public class MapperMethod {
         break;
       }
       case SELECT:
+        // <2.1> 无返回，并且有 ResultHandler 方法参数，则将查询的结果，提交给 ResultHandler 进行处理
         if (method.returnsVoid() && method.hasResultHandler()) {
           executeWithResultHandler(sqlSession, args);
           result = null;
-        } else if (method.returnsMany()) {
+        } else if (method.returnsMany()) {  // <2.2> 执行查询，返回列表
           result = executeForMany(sqlSession, args);
-        } else if (method.returnsMap()) {
+        } else if (method.returnsMap()) {  // <2.3> 执行查询，返回 Map
           result = executeForMap(sqlSession, args);
-        } else if (method.returnsCursor()) {
+        } else if (method.returnsCursor()) {  // <2.4> 执行查询，返回 Cursor
           result = executeForCursor(sqlSession, args);
-        } else {
+        } else {  // <2.5> 执行查询，返回单个对象
           Object param = method.convertArgsToSqlCommandParam(args);
           result = sqlSession.selectOne(command.getName(), param);
           if (method.returnsOptional() &&
@@ -102,6 +106,7 @@ public class MapperMethod {
       throw new BindingException("Mapper method '" + command.getName()
           + " attempted to return null from a method with a primitive return type (" + method.getReturnType() + ").");
     }
+    // 返回结果
     return result;
   }
 
@@ -140,7 +145,11 @@ public class MapperMethod {
 
   private <E> Object executeForMany(SqlSession sqlSession, Object[] args) {
     List<E> result;
+
+    // 转换参数
     Object param = method.convertArgsToSqlCommandParam(args);
+
+    // 执行 SELECT 操作
     if (method.hasRowBounds()) {
       RowBounds rowBounds = method.extractRowBounds(args);
       result = sqlSession.<E>selectList(command.getName(), param, rowBounds);
@@ -148,6 +157,8 @@ public class MapperMethod {
       result = sqlSession.<E>selectList(command.getName(), param);
     }
     // issue #510 Collections & arrays support
+
+    // 封装 Array 或 Collection 结果
     if (!method.getReturnType().isAssignableFrom(result.getClass())) {
       if (method.getReturnType().isArray()) {
         return convertToArray(result);
@@ -178,6 +189,7 @@ public class MapperMethod {
   }
 
   @SuppressWarnings("unchecked")
+  // 对 SqlSession 的 「selectList」 方法的封装。
   private <E> Object convertToArray(List<E> list) {
     Class<?> arrayComponentType = method.getReturnType().getComponentType();
     Object array = Array.newInstance(arrayComponentType, list.size());

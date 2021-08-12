@@ -40,7 +40,9 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 import org.apache.ibatis.session.Configuration;
 
 /**
- * @author Eduardo Macarron
+ * 默认使用此类进行代理
+ * 调用链
+ * 「5.1.3 createProxy 普通方法」 => 「5.1.4.2 createProxy」 => 「5.1.4 createProxy 静态方法」
  */
 public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.ProxyFactory {
 
@@ -49,6 +51,8 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
 
   public JavassistProxyFactory() {
     try {
+
+      // 加载 javassist.util.proxy.ProxyFactory 类
       Resources.classForName("javassist.util.proxy.ProxyFactory");
     } catch (Throwable e) {
       throw new IllegalStateException("Cannot enable lazy loading because Javassist is not available. Add Javassist to your classpath.", e);
@@ -56,10 +60,12 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
   }
 
   @Override
+  // 创建代理对象。
   public Object createProxy(Object target, ResultLoaderMap lazyLoader, Configuration configuration, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
     return EnhancedResultObjectProxyImpl.createProxy(target, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);
   }
 
+  // 创建支持反序列化的代理对象。
   public Object createDeserializationProxy(Object target, Map<String, ResultLoaderMap.LoadPair> unloadedProperties, ObjectFactory objectFactory, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
     return EnhancedDeserializationProxyImpl.createProxy(target, unloadedProperties, objectFactory, constructorArgTypes, constructorArgs);
   }
@@ -69,11 +75,16 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
       // Not Implemented
   }
 
+  // 静态方法，创建代理对象。
   static Object crateProxy(Class<?> type, MethodHandler callback, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
 
+    // 创建 javassist ProxyFactory 对象
     ProxyFactory enhancer = new ProxyFactory();
+
+    // 设置父类
     enhancer.setSuperclass(type);
 
+    // 根据情况，设置接口为 WriteReplaceInterface 。和序列化相关，可以无视
     try {
       type.getDeclaredMethod(WRITE_REPLACE_METHOD);
       // ObjectOutputStream will call writeReplace of objects returned by writeReplace
@@ -86,6 +97,7 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
       // nothing to do here
     }
 
+    // 创建代理对象
     Object enhanced;
     Class<?>[] typesArray = constructorArgTypes.toArray(new Class[constructorArgTypes.size()]);
     Object[] valuesArray = constructorArgs.toArray(new Object[constructorArgs.size()]);
@@ -94,6 +106,7 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
     } catch (Exception e) {
       throw new ExecutorException("Error creating lazy proxy.  Cause: " + e, e);
     }
+    // <x> 设置代理对象的执行器
     ((Proxy) enhanced).setHandler(callback);
     return enhanced;
   }
@@ -146,12 +159,14 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
             }
           } else {
             if (lazyLoader.size() > 0 && !FINALIZE_METHOD.equals(methodName)) {
+
+              // <1.1> 加载所有延迟加载的属性
               if (aggressive || lazyLoadTriggerMethods.contains(methodName)) {
                 lazyLoader.loadAll();
-              } else if (PropertyNamer.isSetter(methodName)) {
+              } else if (PropertyNamer.isSetter(methodName)) { // <1.2> 如果调用了 setting 方法，则不在使用延迟加载
                 final String property = PropertyNamer.methodToProperty(methodName);
                 lazyLoader.remove(property);
-              } else if (PropertyNamer.isGetter(methodName)) {
+              } else if (PropertyNamer.isGetter(methodName)) { // <1.3> 如果调用了 getting 方法，则执行延迟加载
                 final String property = PropertyNamer.methodToProperty(methodName);
                 if (lazyLoader.hasLoader(property)) {
                   lazyLoader.load(property);
@@ -160,6 +175,7 @@ public class JavassistProxyFactory implements org.apache.ibatis.executor.loader.
             }
           }
         }
+        // <2> 继续执行原方法
         return methodProxy.invoke(enhanced, args);
       } catch (Throwable t) {
         throw ExceptionUtil.unwrapThrowable(t);

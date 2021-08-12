@@ -26,9 +26,11 @@ import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 
 /**
- * Builds {@link SqlSession} instances.
+ * SqlSessionFactory 构造器。
  *
- * @author Clinton Begin
+ * 该类提供了各种 build 的重载方法，
+ * 核心的套路都是解析出 Configuration 配置对象，
+ * 从而创建出 DefaultSqlSessionFactory 对象。
  */
 public class SqlSessionFactoryBuilder {
 

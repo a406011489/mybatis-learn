@@ -24,10 +24,7 @@ import org.apache.ibatis.cursor.Cursor;
 import org.apache.ibatis.executor.BatchResult;
 
 /**
- * The primary Java interface for working with MyBatis.
- * Through this interface you can execute commands, get mappers and manage transactions.
- *
- * @author Clinton Begin
+ * SQL Session 接口。
  */
 public interface SqlSession extends Closeable {
 

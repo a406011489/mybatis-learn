@@ -29,10 +29,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
- * This is the default implementation of a MyBatis Cursor.
- * This implementation is not thread safe.
- *
- * @author Guillaume Darmont / guillaume@dropinocean.com
+ * 默认 Cursor 实现类。
  */
 public class DefaultCursor<T> implements Cursor<T> {
 

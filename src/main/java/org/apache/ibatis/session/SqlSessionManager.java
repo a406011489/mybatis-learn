@@ -30,23 +30,31 @@ import org.apache.ibatis.executor.BatchResult;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
- * @author Larry Meadors
+ * SqlSessionManager 是 SqlSessionFactory 和 SqlSession 的职能相加。
+ *
+ * 不过 SqlSessionManager 在实际项目中木有什么用。这里，胖友就是去理解，以及动态代理的使用。
  */
 public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
   private final SqlSessionFactory sqlSessionFactory;
   private final SqlSession sqlSessionProxy;
 
+  /**
+   * 线程变量，当前线程的 SqlSession 对象
+   */
   private final ThreadLocal<SqlSession> localSqlSession = new ThreadLocal<>();
 
   private SqlSessionManager(SqlSessionFactory sqlSessionFactory) {
     this.sqlSessionFactory = sqlSessionFactory;
+
+    // <2> 创建 SqlSession 的代理对象 而方法的拦截器是 SqlSessionInterceptor 类。
     this.sqlSessionProxy = (SqlSession) Proxy.newProxyInstance(
         SqlSessionFactory.class.getClassLoader(),
         new Class[]{SqlSession.class},
         new SqlSessionInterceptor());
   }
 
+  // 静态方法，创建 SqlSessionManager 对象。
   public static SqlSessionManager newInstance(Reader reader) {
     return new SqlSessionManager(new SqlSessionFactoryBuilder().build(reader, null, null));
   }
@@ -95,6 +103,7 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
     this.localSqlSession.set(openSession(execType));
   }
 
+  // 发起一个可被管理的 SqlSession 。
   public void startManagedSession(ExecutorType execType, boolean autoCommit) {
     this.localSqlSession.set(openSession(execType, autoCommit));
   }
@@ -337,6 +346,7 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
     }
   }
 
+  // 实现 InvocationHandler 接口，实现对 sqlSessionProxy 的调用的拦截。
   private class SqlSessionInterceptor implements InvocationHandler {
     public SqlSessionInterceptor() {
         // Prevent Synthetic Access
@@ -344,14 +354,17 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+      // 情况一，如果 localSqlSession 中存在 SqlSession 对象，说明是自管理模式
       final SqlSession sqlSession = SqlSessionManager.this.localSqlSession.get();
       if (sqlSession != null) {
         try {
+          // 直接执行方法
           return method.invoke(sqlSession, args);
         } catch (Throwable t) {
           throw ExceptionUtil.unwrapThrowable(t);
         }
-      } else {
+      } else { // 情况二，如果没有 SqlSession 对象，则直接创建一个
         try (SqlSession autoSqlSession = openSession()) {
           try {
             final Object result = method.invoke(autoSqlSession, args);
