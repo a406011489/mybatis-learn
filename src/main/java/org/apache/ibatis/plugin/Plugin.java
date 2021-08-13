@@ -26,12 +26,27 @@ import java.util.Set;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
- * @author Clinton Begin
+ * 一方面提供创建动态代理对象的方法，
+ * 另一方面实现对指定类的指定方法的拦截处理。
  */
 public class Plugin implements InvocationHandler {
 
+  /**
+   * 目标对象
+   */
   private final Object target;
+
+  /**
+   * 拦截器
+   */
   private final Interceptor interceptor;
+
+  /**
+   * 拦截的方法映射
+   *
+   * KEY：类
+   * VALUE：方法集合
+   */
   private final Map<Class<?>, Set<Method>> signatureMap;
 
   private Plugin(Object target, Interceptor interceptor, Map<Class<?>, Set<Method>> signatureMap) {
@@ -40,16 +55,27 @@ public class Plugin implements InvocationHandler {
     this.signatureMap = signatureMap;
   }
 
+  // 静态方法，创建目标类的代理对象。
   public static Object wrap(Object target, Interceptor interceptor) {
+
+    // <1> 获得拦截的方法映射
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
+
+    // <2> 获得目标类的类型
     Class<?> type = target.getClass();
+
+    // <3> 获得目标类的接口集合
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
+
+    // <3.1> 若有接口，则创建目标对象的 JDK Proxy 对象
     if (interfaces.length > 0) {
       return Proxy.newProxyInstance(
           type.getClassLoader(),
           interfaces,
+              // 因为 Plugin 实现了 InvocationHandler 接口，所以可以作为 JDK 动态代理的调用处理器
           new Plugin(target, interceptor, signatureMap));
     }
+    // <3.2> 如果没有，则返回原始的目标对象
     return target;
   }
 
