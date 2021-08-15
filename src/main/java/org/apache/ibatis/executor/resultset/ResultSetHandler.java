@@ -24,24 +24,18 @@ import java.util.List;
 
 /**
  * SQL 执行后，响应的结果集 ResultSet 的处理
+ *
+ * 负责将JDBC返回的ResultSet结果集对象转换成List类型的集合；
  */
 public interface ResultSetHandler {
 
   /**
    * 处理 {@link java.sql.ResultSet} 成映射的对应的结果
-   *
-   * @param stmt Statement 对象
-   * @param <E> 泛型
-   * @return 结果数组
    */
   <E> List<E> handleResultSets(Statement stmt) throws SQLException;
 
   /**
    * 处理 {@link java.sql.ResultSet} 成 Cursor 对象
-   *
-   * @param stmt Statement 对象
-   * @param <E> 泛型
-   * @return Cursor 对象
    */
   <E> Cursor<E> handleCursorResultSets(Statement stmt) throws SQLException;
 

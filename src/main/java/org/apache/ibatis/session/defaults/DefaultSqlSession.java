@@ -40,11 +40,21 @@ import org.apache.ibatis.session.RowBounds;
 import org.apache.ibatis.session.SqlSession;
 
 /**
- * 默认的 SqlSession 实现类。
+ * SqlSession是MyBatis中用于和数据库交互的顶层类，
+ * 通常将它与ThreadLocal绑定，一个会话使用一个qlSession,
+ * 并且在使用完毕后需要close
  */
 public class DefaultSqlSession implements SqlSession {
 
+  // 封装的mybatis-config.xml文件的Java类
   private final Configuration configuration;
+
+  /**
+   * Executor也是一个接口，他有三个常用的实现类：
+   * BatchExecutor (重用语句并执行批量更新)
+   * ReuseExecutor (重用预处理语句 prepared statements)
+   * SimpleExecutor (普通的执行器，默认)
+   */
   private final Executor executor;
 
   /**
@@ -80,7 +90,6 @@ public class DefaultSqlSession implements SqlSession {
 
   @Override
   public <T> T selectOne(String statement, Object parameter) {
-    // Popular vote was to return null on 0 results and throw exception on too many.
     List<T> list = this.selectList(statement, parameter);
     if (list.size() == 1) {
       return list.get(0);
@@ -163,12 +172,17 @@ public class DefaultSqlSession implements SqlSession {
   }
 
   @Override
+  /**
+   * Executor.query()方法几经转折，最后会创建一个StatementHandler对象，
+   * 然后将必要的参数传递给StatementHandler，
+   * 使用StatementHandler来完成对数据库的查询，最终返回List结果集。
+   */
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
-      // <1> 获得 MappedStatement 对象
+      // <1> 根据传入的 全限定名+方法名 从映射的Map中取出MappedStatement对象
       MappedStatement ms = configuration.getMappedStatement(statement);
 
-      // <2> 执行查询
+      // <2> 调用Executor中的方法处理 RowBounds是用来逻辑分页  wrapCollection(parameter)是用来装饰集合或者数组参数
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);
@@ -317,7 +331,7 @@ public class DefaultSqlSession implements SqlSession {
 
   @Override
   public <T> T getMapper(Class<T> type) {
-    return configuration.<T>getMapper(type, this);
+    return configuration.getMapper(type, this);
   }
 
   @Override

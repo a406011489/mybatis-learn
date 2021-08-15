@@ -29,7 +29,10 @@ import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
 /**
- * @author Clinton Begin
+ * MappedStatement 维护了一条＜select | update | delete | insert＞节点的封装
+ *
+ * 该类与Mapper配置文件中的一个select/update/insert/delete节点相对应。
+ * mapper中配置的标签都被封装到了此对象中，主要用途是描述一条SQL语句。
  */
 public final class MappedStatement {
 

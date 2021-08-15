@@ -27,6 +27,7 @@ import java.util.Properties;
 
 /**
  * Resource 工具类。
+ * 该类帮助你从 类路径下、文件系统或一个 web URL 中加载资源文件。
  */
 public class Resources {
 

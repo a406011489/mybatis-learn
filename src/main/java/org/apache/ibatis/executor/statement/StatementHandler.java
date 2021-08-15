@@ -28,64 +28,48 @@ import org.apache.ibatis.session.ResultHandler;
 /**
  * Statement 处理器
  * 其中 Statement 包含 java.sql.Statement、java.sql.PreparedStatement、java.sql.CallableStatement 三种。
+ *
+ * 封装了JDBC Statement操作，负责对JDBC statement的操作，如设置参数、将Statement结果集转换成List集合。
+ *
+ * 对于JDBC的PreparedStatement类型的对象，创建的过程中，我们使用的是SQL语句字符串会包含若干个问号(？)占位符，
+ * 我们其后再对占位符进行设值。StatementHandler通过parameterize(statement)方法对 Statement 进行设值；
+ *
+ * StatementHandler 通过 List query(Statement statement, ResultHandler resultHandler)方法来
+ * 完成执行Statement，和将Statement对象返回的resultSet封装成List；
+ *
  */
 public interface StatementHandler {
 
   /**
    * 准备操作，可以理解成创建 Statement 对象
-   *
-   * @param connection Connection 对象
-   * @param transactionTimeout 事务超时时间
-   * @return Statement 对象
    */
-  Statement prepare(Connection connection, Integer transactionTimeout)
-      throws SQLException;
+  Statement prepare(Connection connection, Integer transactionTimeout) throws SQLException;
 
   /**
    * 设置 Statement 对象的参数
-   *
-   * @param statement Statement 对象
    */
-  void parameterize(Statement statement)
-      throws SQLException;
+  void parameterize(Statement statement) throws SQLException;
 
   /**
    * 添加 Statement 对象的批量操作
-   *
-   * @param statement Statement 对象
    */
-  void batch(Statement statement)
-      throws SQLException;
+  void batch(Statement statement) throws SQLException;
 
   /**
    * 执行写操作
-   *
-   * @param statement Statement 对象
-   * @return 影响的条数
    */
-  int update(Statement statement)
-      throws SQLException;
+  int update(Statement statement) throws SQLException;
 
   /**
    * 执行读操作
-   *
-   * @param statement Statement 对象
    * @param resultHandler ResultHandler 对象，处理结果
-   * @param <E> 泛型
-   * @return 读取的结果
    */
-  <E> List<E> query(Statement statement, ResultHandler resultHandler)
-      throws SQLException;
+  <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException;
 
   /**
    * 执行读操作，返回 Cursor 对象
-   *
-   * @param statement Statement 对象
-   * @param <E> 泛型
-   * @return Cursor 对象
    */
-  <E> Cursor<E> queryCursor(Statement statement)
-      throws SQLException;
+  <E> Cursor<E> queryCursor(Statement statement) throws SQLException;
 
   /**
    * @return BoundSql 对象

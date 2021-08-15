@@ -20,6 +20,8 @@ import java.sql.SQLException;
 
 /**
  * 参数处理器接口。 实现设置 PreparedStatement 的占位符参数。
+ *
+ * 负责对用户传递的参数转换成JDBC Statement所需要的参数
  */
 public interface ParameterHandler {
 
@@ -31,11 +33,7 @@ public interface ParameterHandler {
 
   /**
    * 设置 PreparedStatement 的占位符参数
-   *
-   * @param ps PreparedStatement 对象
-   * @throws SQLException 发生 SQL 异常时
    */
-  void setParameters(PreparedStatement ps)
-      throws SQLException;
+  void setParameters(PreparedStatement ps) throws SQLException;
 
 }

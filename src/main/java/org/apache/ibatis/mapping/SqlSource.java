@@ -16,7 +16,7 @@
 package org.apache.ibatis.mapping;
 
 /**
- * SQL 来源接口。它代表从 Mapper XML 或方法注解上，读取的一条 SQL 内容。
+ * 负责根据用户传递的parameterObject，动态地生成SQL语句，将信息封装到BoundSql对象中，并返回
  */
 public interface SqlSource {
 

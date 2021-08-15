@@ -188,7 +188,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
    * 处理 java.sql.ResultSet 结果集，转换成映射的对应结果。
    * 这个方法，不仅仅支持处理 Statement 和 PreparedStatement 返回的结果集，
    * 也支持存储过程的 CallableStatement 返回的结果集。
-   * 而 CallableStatement 是支持返回多结果集的，这个大家要注意。
+   * 而 CallableStatement 是支持返回多结果集的。
    */
   @Override
   public List<Object> handleResultSets(Statement stmt) throws SQLException {

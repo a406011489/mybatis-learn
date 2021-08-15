@@ -24,7 +24,7 @@ import org.apache.ibatis.reflection.property.PropertyTokenizer;
 import org.apache.ibatis.session.Configuration;
 
 /**
- * 一次可执行的 SQL 封装。
+ * 表示动态生成的SQL语句以及相应的参数信息
  */
 public class BoundSql {
 

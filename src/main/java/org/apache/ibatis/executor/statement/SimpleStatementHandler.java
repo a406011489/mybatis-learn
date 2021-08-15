@@ -112,7 +112,7 @@ public class SimpleStatementHandler extends BaseStatementHandler {
 
   @Override
   public void parameterize(Statement statement) {
-    // N/A  因为无需做占位符参数的处理。
+    // 因为无需做占位符参数的处理。
   }
 
 }

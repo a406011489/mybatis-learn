@@ -39,16 +39,27 @@ public class PluginTest {
     assertFalse("Always".equals(map.toString()));
   }
 
-  @Intercepts({
-      @Signature(type = Map.class, method = "get", args = {Object.class})})
+
+  @Intercepts(
+      {
+          // 可以定义多个@Signature对多个地方拦截，都用这个拦截器
+          @Signature(type = Map.class, // 这是指拦截哪个接口
+                  method = "get",      // 这个接口内的哪个方法名
+                  args = {Object.class} // 这是拦截的方法的入参，按顺序写到这，不要多也不要少，如果方法重载，可是要通过方法名和入参来确定唯一的
+          )
+      }
+  )
   // 通过 @Intercepts 和 @Signature 注解，定义了需要拦截的方法为 Map 类型、方法为 "get" 方法，方法参数为 Object.class 。
   public static class AlwaysMapPlugin implements Interceptor {
-    @Override
+
     // 在实现方法 #intercept(Invocation invocation) 方法，
     // 直接返回 "Always" 字符串。也就是说，当所有的 target 类型为 Map 类型，
-    // 并且调用 Map#get(Object) 方法时，返回的都是 "Always" 。
+    @Override
     public Object intercept(Invocation invocation) throws Throwable {
-      return "Always";
+      // 可以在此进行增强逻辑
+
+      // 并且调用 Map#get(Object) 方法时，返回的都是 "Always"
+      return "Always11";
     }
 
     @Override
@@ -64,5 +75,4 @@ public class PluginTest {
     public void setProperties(Properties properties) {
     }
   }
-
 }

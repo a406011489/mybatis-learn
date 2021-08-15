@@ -95,7 +95,17 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
- * @author Clinton Begin
+ * xml中的配置标签有哪些：
+ * properties (属性)，
+ * settings (设置)，
+ * typeAliases (类型别名)，
+ * typeHandlers (类型处理器)，
+ * objectFactory (对象工厂)，
+ * mappers (映射器)等
+ *
+ * 该类就用属性来封装它们
+ *
+ * 也就是说，初始化配置文件信息的本质就是创建Configuration对象，将解析的xml数据封装到Configuration内部属性中
  */
 public class Configuration {
 
@@ -150,15 +160,25 @@ public class Configuration {
    */
   protected Class<?> configurationFactory;
 
+  /**
+   * 该属性内部维护一个HashMap用于存放mapper接口的工厂类，
+   * 每个接口对应一个工厂类。mappers中可以配置接口的包路径，或者某个具体的接口类。
+   */
   protected final MapperRegistry mapperRegistry = new MapperRegistry(this);
   protected final InterceptorChain interceptorChain = new InterceptorChain();
   protected final TypeHandlerRegistry typeHandlerRegistry = new TypeHandlerRegistry();
   protected final TypeAliasRegistry typeAliasRegistry = new TypeAliasRegistry();
   protected final LanguageDriverRegistry languageRegistry = new LanguageDriverRegistry();
 
+  /**
+   * mapper文件中的select标签会在初始化配置文件时被解析封装成一个MappedStatement对象
+   * 然后存储在该属性中，这个属性本质是一个HashMap，
+   * 存储时key=全限定类名+方法名，value =对应的MappedStatement对象。
+   */
   protected final Map<String, MappedStatement> mappedStatements = new StrictMap<MappedStatement>("Mapped Statements collection")
       .conflictMessageProducer((savedValue, targetValue) ->
           ". please check " + savedValue.getResource() + " and " + targetValue.getResource());
+
   protected final Map<String, Cache> caches = new StrictMap<>("Caches collection");
   protected final Map<String, ResultMap> resultMaps = new StrictMap<>("Result Maps collection");
   protected final Map<String, ParameterMap> parameterMaps = new StrictMap<>("Parameter Maps collection");

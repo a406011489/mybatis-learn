@@ -32,10 +32,13 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 
 /**
- * 默认的 SqlSessionFactory 实现类。
+ * SqlSession是MyBatis中用于和数据库交互的顶层类，
+ * 通常将它与ThreadLocal绑定，一个会话使用一 个SqlSession,
+ * 并且在使用完毕后需要close
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
+  // 封装的mybatis-config.xml文件的Java类
   private final Configuration configuration;
 
   public DefaultSqlSessionFactory(Configuration configuration) {
@@ -43,11 +46,14 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
   }
 
   @Override
+  // 会默认开启一个事务，但事务不会自动提交，也就意味着需要手动提交该事务。
   public SqlSession openSession() {
+    // getDefaultExecutorType()传递的是SimpleExecutor
     return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, false);
   }
 
   @Override
+  // 开启自动提交
   public SqlSession openSession(boolean autoCommit) {
     return openSessionFromDataSource(configuration.getDefaultExecutorType(), null, autoCommit);
   }
@@ -99,7 +105,7 @@ public class DefaultSqlSessionFactory implements SqlSessionFactory {
       final TransactionFactory transactionFactory = getTransactionFactoryFromEnvironment(environment);
       tx = transactionFactory.newTransaction(environment.getDataSource(), level, autoCommit);
 
-      // 创建 Executor 对象
+      // 根据参数创建指定类型的 Executor
       final Executor executor = configuration.newExecutor(tx, execType);
 
       // 创建 DefaultSqlSession

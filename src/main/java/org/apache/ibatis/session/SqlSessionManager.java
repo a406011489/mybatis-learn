@@ -33,6 +33,8 @@ import org.apache.ibatis.reflection.ExceptionUtil;
  * SqlSessionManager 是 SqlSessionFactory 和 SqlSession 的职能相加。
  *
  * 不过 SqlSessionManager 在实际项目中木有什么用。这里，胖友就是去理解，以及动态代理的使用。
+ *
+ * 以及被弃用，就不做介绍
  */
 public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 

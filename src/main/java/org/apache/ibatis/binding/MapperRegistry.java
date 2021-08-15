@@ -49,15 +49,15 @@ public class MapperRegistry {
 
   @SuppressWarnings("unchecked")
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
-    // <1> 获得 MapperProxyFactory 对象
+    // 从 MapperRegistry 中的 HashMap 中拿 MapperProxyFactory
     final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
 
     // 不存在，则抛出 BindingException 异常
     if (mapperProxyFactory == null) {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
-    // 创建 Mapper Proxy 对象
     try {
+      //通过动态代理工厂生成示例。
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);

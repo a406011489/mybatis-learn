@@ -57,6 +57,7 @@ public class MapperMethod {
 
   public Object execute(SqlSession sqlSession, Object[] args) {
     Object result;
+    // 判断mapper中的方法类型，最终调用的还是SqlSession中的方法
     switch (command.getType()) {
       case INSERT: {
         // 转换参数
