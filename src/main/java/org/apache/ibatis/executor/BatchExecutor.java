@@ -49,6 +49,7 @@ import org.apache.ibatis.transaction.Transaction;
  * 就像苹果蓝里装了很多苹果，
  * 番茄蓝里装了很多番茄，
  * 最后，再统一倒进仓库。（可以是Statement或PrepareStatement对象）
+ * 今天安装新环境，明天再来学习
  */
 public class BatchExecutor extends BaseExecutor {
 
