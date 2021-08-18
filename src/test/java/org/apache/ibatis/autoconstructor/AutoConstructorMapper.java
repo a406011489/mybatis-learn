@@ -16,10 +16,12 @@
 package org.apache.ibatis.autoconstructor;
 
 import org.apache.ibatis.annotations.Select;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
 
 public interface AutoConstructorMapper {
+
   @Select("SELECT * FROM subject WHERE id = #{id}")
   PrimitiveSubject getSubject(final int id);
 

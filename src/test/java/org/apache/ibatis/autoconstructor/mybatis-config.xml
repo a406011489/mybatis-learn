@@ -17,6 +17,10 @@
                 <property name="driver" value="org.hsqldb.jdbcDriver"/>
                 <property name="url" value="jdbc:hsqldb:mem:automapping"/>
                 <property name="username" value="sa"/>
+<!--                <property name="driverClass" value="com.mysql.jdbc.Driver"/>-->
+<!--                <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/user?useSSL=false&amp;allowPublicKeyRetrieval=true&amp;serverTimezone=GMT%2B8"/>-->
+<!--                <property name="user" value="root"/>-->
+<!--                <property name="password" value="123456"/>-->
             </dataSource>
 
         </environment>
